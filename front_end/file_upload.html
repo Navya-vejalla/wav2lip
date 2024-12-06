@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Files</title>
+    <style>
+        body {
+            background-image: url('/Wav2Lip-master/images/wav_img.jpg');
+            background-size: cover; /* Make the background cover the entire screen */
+            background-position: center; /* Center the background image */
+            background-repeat: no-repeat; /* Prevent repeating the image */
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh; /* Ensure the body takes full height of the viewport */
+        }
+
+
+        h1 {
+            color: #333;
+        }
+
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 300px;
+        }
+
+        input[type="file"] {
+            border: 2px solid #007BFF;
+            padding: 10px;
+            border-radius: 4px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="file"]:focus {
+            border-color: #0056b3;
+            outline: none;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #videoContainer {
+            margin-top: 20px;
+            max-width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        video {
+            max-width: 100%;
+            border: 2px solid #007BFF;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Upload Files</h1>
+    <form id="uploadForm">
+        <input type="file" name="file1" accept=".mp3, .mp4, .wav" required>
+        <input type="file" name="file2" accept=".mp3, .mp4, .wav" required>
+        <button type="submit">Upload</button>
+    </form>
+    <div id="videoContainer"></div>
+
+    <script>
+        document.getElementById('uploadForm').onsubmit = function(event) {
+            event.preventDefault();
+            console.log('Form submitted');
+            const formData = new FormData(event.target);
+
+            fetch('/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.output_video) {
+                    // Construct the URL to the video
+                    const videoUrl = `/output/${data.output_video}`;
+                    
+                    // Create a video element
+                    const videoElement = document.createElement('video');
+                    videoElement.src = videoUrl;
+                    videoElement.controls = true; // Add controls to the video player
+                    videoElement.autoplay = true; // Optionally autoplay
+
+                    // Clear previous videos
+                    document.getElementById('videoContainer').innerHTML = '';
+                    // Append the video to a specific element in your HTML
+                    document.getElementById('videoContainer').appendChild(videoElement);
+                } else {
+                    console.error('Output video not found in response');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        };
+    </script>
+</body>
+</html>
